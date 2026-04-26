@@ -480,9 +480,13 @@ gcc -E programa.c | grep "Iniciando"
 gcc -E -DDEBUG programa.c | grep "Iniciando"
 ```
 
-> **R:** gcc -E programa.c | grep "Iniciando" <br>
->         _Sin salida_ <br><br>
->        gcc -E -DDEBUG programa.c | grep "Iniciando" <br>printf("[DEBUG] %s\n", ("Iniciando main"));
+> **R:** 
+> ```bash 
+>       gcc -E programa.c | grep "Iniciando" 
+>          
+>       gcc -E -DDEBUG programa.c | grep "Iniciando" 
+>       printf("[DEBUG] %s\n", ("Iniciando main"));
+> ```
 
 ¿Agregar `-DDEBUG` hace que aparezca código nuevo en el `.i` que antes no estaba?
 Respondé SI o NO:
@@ -667,7 +671,12 @@ Aparecen como instrucciones de llamada (por ejemplo `bl _area_circulo`), pero **
 
 **P7.** Ejecutá `grep "area_circulo" programa.s` y copiá la salida.
 
-> **R:** .ascii "area_circulo(%.1f) = %.4f\12\0"  <br> call    area_circulo <br> .def    area_circulo;   .scl    2;      .type   32;     .endef
+> **R:** 
+> ```bash
+>   .ascii "area_circulo(%.1f) = %.4f\12\0" 
+>   call    area_circulo 
+>   .def    area_circulo;   .scl    2;      .type   32;     .endef
+>```
 
 ¿`area_circulo` aparece como una función *definida* en `programa.s`
 (con su propio bloque de instrucciones) o solo como una *llamada* (instrucción sin cuerpo)?
@@ -681,13 +690,24 @@ AREA_EN_S=LLAMADA
 **P8.** Encontrá en `programa.s` la etiqueta `sumar:` o `_sumar:` y copiá
 las primeras 4 líneas de instrucciones que le siguen.
 
-> **R:** pushq	%rbp <br>.seh_pushreg	%rbp<br>movq	%rsp, %rbp<br>.seh_setframe	%rbp, 0
+> **R:** 
+> ```asm
+>   pushq	%rbp
+>   .seh_pushreg	%rbp
+>   movq	%rsp, %rbp
+>   .seh_setframe	%rbp, 0
+>```
 
 Explicá en términos generales qué hacen esas instrucciones
 (usá los comentarios del laboratorio como guía):
 
-> **R:** pushq	%rbp ;  resguarda el valor del puntero base anterior en la pila <br>.seh_pushreg	%rbp ; registra el resguardo de %rbp para el manejo de excepciones<br>movq	%rsp, %rbp ; establece un nuevo marco de pila (puntero base = puntero de pila actual)<br>.seh_setframe	%rbp, 0 ; informa al sistema operativo que %rbp es el nuevo marco de referencia
-
+> **R:** 
+> ```asm
+>   pushq	%rbp                ;   resguarda el valor del puntero base anterior en la pila 
+>   .seh_pushreg	%rbp        ;   registra el resguardo de %rbp para el manejo de excepciones
+>   movq	%rsp, %rbp          ;   establece un nuevo marco de pila (puntero base = puntero de pila actual)
+>   .seh_setframe	%rbp, 0     ;   informa al sistema operativo que %rbp es el nuevo marco de referencia
+>```
 ---
 
 Ejecutar para verificar si la variable `llamadas` aparece en el ensamblador:
@@ -699,11 +719,14 @@ grep "llamadas" programa.s
 
 **P9.** Ejecutá `grep "llamadas" programa.s` y copiá la salida.
 
-> **R:** .globl  llamadas<br>
->llamadas:<br>
->        movl    llamadas(%rip), %eax<br>
->        movl    %eax, llamadas(%rip)<br>
->        movl    llamadas(%rip), %eax<br>
+> **R:** 
+> ```bash
+>        .globl  llamadas
+> llamadas:
+>        movl    llamadas(%rip), %eax
+>        movl    %eax, llamadas(%rip)
+>        movl    llamadas(%rip), %eax
+>```
 
 ¿Aparece la variable `llamadas` en el ensamblador?
 Respondé SI o NO:
@@ -813,13 +836,32 @@ Salida esperada (simplificada):
 
 **P10.** Ejecutá `nm programa.o` y copiá la salida completa.
 
-> **R:**
+> **R:** 
+>```bash 
+>0000000000000000 b .bss
+>0000000000000000 d .data
+>0000000000000000 p .pdata
+>0000000000000000 r .rdata
+>0000000000000000 r .rdata$zzz
+>0000000000000000 t .text
+>0000000000000000 r .xdata
+>                 U __imp___acrt_iob_func
+>                 U __main
+>                 U __mingw_vfprintf
+>                 U area_circulo
+>                 U factorial
+>00000000000001b3 T imprimir_separador
+>0000000000000000 B llamadas
+>0000000000000077 T main
+>0000000000000000 t printf
+>0000000000000054 T sumar
+>```
 
 ¿Con qué letra aparece `area_circulo` en esa tabla?
 Escribí solo la letra (una mayúscula):
 
 <!-- Completá con la letra exacta que muestra nm (U, T, D, etc.): -->
-TIPO_AREA_EN_O=
+TIPO_AREA_EN_O=U
 
 ---
 
@@ -839,13 +881,14 @@ nm matematica.o
 **P11.** ¿Por qué `area_circulo` tiene ese tipo en `programa.o`
 pero tipo `T` en `matematica.o`?
 
-> **R:**
+> **R:** En programa.o la funcion area_circulo tiene tipo **U (Undefined)** porque en ese archivo solo se encuentra la declaracion y una llamada a la funcion, pero no su implementacion. El compilador sabe que existe, pero no sabe que instrucciones ejecutar.
+> En cambio, en matematica.o tiene tipo **T (Text)** porque ahi es donde se encuentra la definicion. El simbolo **T** indica que la funcion esta definida en la sección de codigo de ese archivo objeto.
 
 ¿Qué etapa del proceso de compilación resuelve esa diferencia?
 Respondé con una palabra: PREPROCESAMIENTO, COMPILACION, ENSAMBLADO o ENLAZADO:
 
 <!-- Completá con una de las cuatro opciones: -->
-ETAPA_QUE_RESUELVE=
+ETAPA_QUE_RESUELVE=ENLAZADO
 
 ---
 
@@ -864,13 +907,16 @@ Un `.o` no es ejecutable por dos razones:
 
 **P12.** Intentá ejecutar `./programa.o` directamente. ¿Qué mensaje aparece?
 
-> **R:**
+> **R:** 
+>```bash 
+> ./programa.o: cannot execute binary file: Exec format error
+>```
 
 ¿Se puede ejecutar un archivo `.o` directamente?
 Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
-EJECUTABLE_O=
+EJECUTABLE_O=NO
 
 ---
 
