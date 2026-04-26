@@ -667,26 +667,26 @@ Aparecen como instrucciones de llamada (por ejemplo `bl _area_circulo`), pero **
 
 **P7.** Ejecutá `grep "area_circulo" programa.s` y copiá la salida.
 
-> **R:**
+> **R:** .ascii "area_circulo(%.1f) = %.4f\12\0"  <br> call    area_circulo <br> .def    area_circulo;   .scl    2;      .type   32;     .endef
 
 ¿`area_circulo` aparece como una función *definida* en `programa.s`
 (con su propio bloque de instrucciones) o solo como una *llamada* (instrucción sin cuerpo)?
 Respondé DEFINIDA o LLAMADA:
 
 <!-- Completá con DEFINIDA o LLAMADA: -->
-AREA_EN_S=
+AREA_EN_S=LLAMADA
 
 ---
 
 **P8.** Encontrá en `programa.s` la etiqueta `sumar:` o `_sumar:` y copiá
 las primeras 4 líneas de instrucciones que le siguen.
 
-> **R:**
+> **R:** pushq	%rbp <br>.seh_pushreg	%rbp<br>movq	%rsp, %rbp<br>.seh_setframe	%rbp, 0
 
 Explicá en términos generales qué hacen esas instrucciones
 (usá los comentarios del laboratorio como guía):
 
-> **R:**
+> **R:** pushq	%rbp ;  resguarda el valor del puntero base anterior en la pila <br>.seh_pushreg	%rbp ; registra el resguardo de %rbp para el manejo de excepciones<br>movq	%rsp, %rbp ; establece un nuevo marco de pila (puntero base = puntero de pila actual)<br>.seh_setframe	%rbp, 0 ; informa al sistema operativo que %rbp es el nuevo marco de referencia
 
 ---
 
@@ -699,13 +699,17 @@ grep "llamadas" programa.s
 
 **P9.** Ejecutá `grep "llamadas" programa.s` y copiá la salida.
 
-> **R:**
+> **R:** .globl  llamadas<br>
+>llamadas:<br>
+>        movl    llamadas(%rip), %eax<br>
+>        movl    %eax, llamadas(%rip)<br>
+>        movl    llamadas(%rip), %eax<br>
 
 ¿Aparece la variable `llamadas` en el ensamblador?
 Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
-LLAMADAS_EN_S=
+LLAMADAS_EN_S=SI
 
 ---
 
