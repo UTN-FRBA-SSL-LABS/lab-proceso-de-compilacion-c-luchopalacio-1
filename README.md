@@ -1005,13 +1005,16 @@ nm programa | grep area_circulo
 **P13.** Enlazá con `gcc programa.o matematica.o -o programa`.
 Ejecutá `nm programa | grep "area_circulo"` y copiá la salida.
 
-> **R:**
+> **R:** 
+> ```bash
+> 0000000140001630 T area_circulo
+>```
 
 ¿Con qué letra aparece ahora `area_circulo` en el ejecutable final?
 Escribí solo la letra:
 
 <!-- Completá con la letra exacta que muestra nm: -->
-TIPO_AREA_ENLAZADO=
+TIPO_AREA_ENLAZADO=T
 
 ---
 
@@ -1027,17 +1030,20 @@ Quedan algunos `U` incluso en el ejecutable final. ¿Por qué? Son funciones de 
 
 **P14.** Ejecutá `nm programa | grep "^ *U"` y copiá la salida.
 
-> **R:**
+> **R:** 
+>```bash
+> U __end__
+>``` 
 
 ¿Quedan símbolos de tipo `U` en el ejecutable final?
 Respondé SI o NO:
 
 <!-- Completá con SI o NO: -->
-SIMBOLOS_U_FINAL=
+SIMBOLOS_U_FINAL=SI
 
 ¿Por qué quedan? ¿Quién los resuelve y cuándo?
 
-> **R:**
+> **R:** Porque son funciones de la biblioteca dinámica del sistema (`libc.dylib`): como se cargan en tiempo de ejecución, el enlazador no las copia, sólo deja registrado su nombre para que el **cargador dinámico** (`dyld`/`ld.so`) las resuelva cuando el programa se ejecute.
 
 ---
 
@@ -1052,11 +1058,29 @@ SIMBOLOS_U_FINAL=
 **P15.** Ejecutá `./programa` y copiá la salida completa.
 
 > **R:**
+>```bash
+>=== Laboratorio de Compilacion en C (v1.0) ===
+>
+>sumar(3, 4)       = 7
+>CUADRADO(5)      = 25
+>MAX(7, 12)        = 12
+>----------------------------------------
+>area_circulo(5.0) = 78.5398
+>Factoriales:
+>  0! = 1
+>  1! = 1
+>  2! = 2
+>  3! = 6
+>  4! = 24
+>  5! = 120
+>----------------------------------------
+>Llamadas a sumar(): 1
+>```
 
 ¿Qué valor da `factorial(5)`? Escribí solo el número:
 
 <!-- Completá con el número exacto: -->
-FACTORIAL_5=
+FACTORIAL_5=120
 
 ---
 
@@ -1068,14 +1092,17 @@ FACTORIAL_5=
 como `CUADRADO(x)` y una **función real** como `sumar(a, b)`.
 ¿En qué etapa "desaparece" cada una? ¿Cuál tiene verificación de tipos?
 
-> **R:**
+> **R:** <br>Una macro funcion es una "plantilla" creada con #define, la cual supone una sustitucion textual de la palabra, por ejemplo CUADRADO(x), no es codigo real, sino una instruccion para que el preprocesador busque la palabra y la reemplace por el texto que nosotros le pedimos. Mientras que  una funcion real como sumar(a,b) es un bloque de codigo independiente con su propio lugar en la memoria, al que el programa tiene que saltar para  ejecutarlo.<br>
+>La macrofuncion desaparece durante la etapa de preprocesamiento mientras que las funciones reales en la etapa de enlazado.<br>
+>La macro no tiene verificacion de tipos porque el preprocesador no entiende C, mientras que la función real si tiene verificacion de tipos durante la compilacion.  
 
 ---
 
 **P17.** ¿Qué diferencia hay entre un símbolo de tipo `T` y uno de tipo `D`
 en la salida de `nm`? ¿En qué sección del archivo objeto vive cada uno?
 
-> **R:**
+> **R:** Un simbolo de tipo T indica que esta definido en la seccion de codigo (text), es decir, corresponde a funciones o instrucciones ejecutables.<br>
+>Un simbolo de tipo D indica que esta definido en la seccion de data, es decir, variables globales o estaticas que tienen un valor inicial.
 
 ---
 
@@ -1083,10 +1110,16 @@ en la salida de `nm`? ¿En qué sección del archivo objeto vive cada uno?
 y copiá la salida.
 
 > **R:**
+> ```bash
+>        ntdll.dll => /c/Windows/SYSTEM32/ntdll.dll (0x7ffa599b0000)
+>        KERNEL32.DLL => /c/Windows/System32/KERNEL32.DLL (0x7ffa594c0000)
+>        KERNELBASE.dll => /c/Windows/System32/KERNELBASE.dll (0x7ffa570c0000)
+>        msvcrt.dll => /c/Windows/System32/msvcrt.dll (0x7ffa58ce0000)
+>```
 
 ¿Por qué `libc` no hubo que especificarla explícitamente al enlazar con `gcc`?
 
-> **R:**
+> **R:** No fue necesario especificar libc explicitamente al enlazar con gcc porque el compilador la incluye automaticamente durante la etapa de enlazado. Gcc, ademas de compilar, invoca al enlazador agregando por defecto las bibliotecas estandar del sistema, entre ellas la biblioteca C (libc). Por eso funciones como printf pueden utilizarse sin necesidad de enlazarla manualmente.
 
 ---
 
